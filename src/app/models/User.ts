@@ -11,7 +11,7 @@ import {
 import { compare, hash } from 'bcrypt';
 
 import {
-
+UserExperience
 } from './index';
 
 @Entity({ name: 'Users' })
@@ -85,6 +85,12 @@ export class User {
     nullable: true,
   })
   code?: number | null;
+
+  
+  @OneToMany(() => UserExperience, (userExperience) => userExperience.user, {
+    onDelete: 'CASCADE',
+  })
+  userExperiences?: UserExperience[];
 
   @CreateDateColumn({
     name: 'created_at',

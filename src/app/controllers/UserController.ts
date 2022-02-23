@@ -3,18 +3,28 @@ import { EntityNotFoundError } from 'typeorm';
 import path from 'path';
 import * as Yup from 'yup';
 import { User } from '@models';
-import {  Mailer, Sms, Storage, Token } from '@utils';
+import { Mailer, Sms, Storage, Token } from '@utils';
 import { UserValidator } from '@validators';
 
 import {
   UserRepository,
+  UserExperienceRepository,
+  BoatCategoryRepository
 } from '@repositories';
 
 class UserController {
   async store(req: Request, res: Response): Promise<Response> {
     try {
-      const { profileImage, ...body } = await UserValidator.store(req.body);
-      const { email } = body;
+      const { profileImage, boatCategories, ...body } = await UserValidator.store(req.body);
+      const { email, acceptedTermsOfUse, acceptedPrivacyPolicy, } = body;
+
+      if (!acceptedPrivacyPolicy) {
+        return res.status(401).json({ message: 'accepted Privacy Policy is required how true' })
+      }
+
+      if (!acceptedTermsOfUse) {
+        return res.status(401).json({ message: 'accepted Terms Of Use is required how true' })
+      }
 
       const emailAlreadyExists = await UserRepository.emailExists(
         email.toLowerCase()
@@ -24,11 +34,27 @@ class UserController {
         return res.status(400).json({ message: 'Email already exists' });
       }
 
-      let user: User = await UserRepository.store(body);
+      let user: User = await UserRepository.store({ ...body });
 
       if (profileImage) {
         const profileImageUrl = await Storage.uploadImg(profileImage, 'profile');
         await UserRepository.update(user.id, { profileImage: profileImageUrl });
+      }
+
+      if (boatCategories) {
+        const userExperienceIds = await UserExperienceRepository.getUserExperienceIds(
+          user.id
+        );
+
+        const boatCategoryValidIds = await BoatCategoryRepository.validateIds(
+          boatCategories
+        );
+
+        await UserExperienceRepository.setUserExperience(
+          user.id,
+          userExperienceIds,
+          boatCategoryValidIds
+        );
       }
 
       user = await UserRepository.findOne({ where: { id: user.id } });

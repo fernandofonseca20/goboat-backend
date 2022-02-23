@@ -15,7 +15,7 @@
     "docker:down": "docker compose down",
     "########################################## TYPEORM #############################################": "",
     "create:migrate": "npx typeorm migration:create -n",
-    "migrate:local": "NODE_ENV=dev ts-node --transpile-only ./node_modules/typeorm/cli.js migration:run",
+    "migrate:local": "npx ts-node --transpile-only ./node_modules/typeorm/cli.js migration:run",
     "revert:local": "NODE_ENV=dev ts-node --transpile-only ./node_modules/typeorm/cli.js migration:revert",
     "migrate": "typeorm migration:run",
     "revert": "typeorm migration:revert",

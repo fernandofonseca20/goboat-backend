@@ -11,8 +11,7 @@ import { User } from '@models';
 import { Code } from '@utils';
 
 class UserRepository {
-  private relations: string[] = [
-  ];
+  private relations: string[] = [];
 
   async store(body: IUser): Promise<User> {
     const connection: Connection = getConnection();
@@ -22,7 +21,7 @@ class UserRepository {
     await queryRunner.startTransaction();
 
     try {
-      const { email, password, firstName, lastName, bornDate } = body;
+      const { email, password, firstName, lastName, bornDate, documentNumber} = body;
 
       const user: User = queryRunner.manager.create(User, {
         email,
@@ -31,6 +30,8 @@ class UserRepository {
         lastName,
         fullName: `${firstName} ${lastName}`,
         bornDate,
+        documentNumber,
+        ...body
       });
 
       await queryRunner.manager.save(user);
