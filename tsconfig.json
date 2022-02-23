@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "lib": ["es6"],
+    "allowJs": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "removeComments": false,
+    "typeRoots": ["./node_modules/@types", "./src/@types"],
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "Node",
+    "baseUrl": ".",
+    "paths": {
+      "@controllers": ["./src/app/controllers"],
+      "@interfaces": ["./src/app/interfaces"],
+      "@middlewares": ["./src/app/middlewares"],
+      "@models": ["./src/app/models"],
+      "@repositories": ["./src/app/repositories"],
+      "@routes": ["./src/app/routes"],
+      "@utils": ["./src/app/utils"],
+      "@validators": ["./src/app/validators"],
+      "@config/*": ["./src/config/*"]
+    }
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["./dist"]
+}

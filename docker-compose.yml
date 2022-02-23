@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  database:
+    container_name: database-goboat
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=goboat
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_HOST_AUTH_METHOD=trust
+
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/data/postgres
+  # api:
+  #   build: .
+  #   ports:
+  #     - '3333:3333'
+  #   command: yarn start:ts
+  #   restart: always
+  #   volumes: 
+  #     - .:/user/app
+  #   links:
+  #     - database 
+  #   depends_on:
+  #     - database
+
+
+volumes:
+  pgdata: 
+    driver: local
