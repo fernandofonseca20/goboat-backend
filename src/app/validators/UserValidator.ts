@@ -68,14 +68,10 @@ class UserValidator {
     obj: object
   ): Promise<{ email?: string; phone?: string; code: number }> {
     const schema = Yup.object().shape({
-      email: Yup.string().email(),
-      phone: Yup.string(),
       code: Yup.number().required(),
     });
 
     const body = await schema.validate(obj);
-
-    if (body.email) body.email = body.email.toLowerCase();
 
     return body;
   }

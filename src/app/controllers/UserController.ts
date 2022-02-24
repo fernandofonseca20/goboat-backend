@@ -9,7 +9,8 @@ import { UserValidator } from '@validators';
 import {
   UserRepository,
   UserExperienceRepository,
-  BoatCategoryRepository
+  BoatCategoryRepository,
+  UserTokenRepository
 } from '@repositories';
 
 class UserController {
@@ -161,7 +162,7 @@ class UserController {
 
       const token: string = await Token.generateUserToken(isValid);
 
-      return res.status(200).json({ user, token });
+      return res.status(200).json({ userType: 'user', user, token });
     } catch (error) {
       console.log('UserController sign in error', error);
       if (error instanceof EntityNotFoundError)
@@ -195,44 +196,11 @@ class UserController {
 
   async generateCode(req: Request, res: Response) {
     try {
-      const { email, phone } = await UserValidator.genereateCode(req.body);
+      const { phone } = await UserValidator.genereateCode(req.body);
       let code: number;
 
-      if (email) {
-        code = await UserRepository.generateCode(email, 'email');
-
-        const user = await UserRepository.findOne({ where: { email } });
-
-        if (!user) return res.status(404).json({ message: 'User not found' });
-
-        const template = path.resolve(
-          __dirname,
-          '..',
-          'views',
-          'verify_email.html'
-        );
-
-        await Mailer.sendMail(
-          template,
-          {
-            name: user.fullName,
-            code,
-          },
-          // {
-          //   name: user.fullName,
-          //   address: email,
-          // },
-          email,
-          'Verificação de email'
-        );
-      } else if (phone) {
-        code = await UserRepository.generateCode(phone, 'phone');
-        await Sms.sendTokenSms(phone, code);
-      } else {
-        return res
-          .status(400)
-          .json({ message: 'Email or phone must be provided' });
-      }
+      code = await UserTokenRepository.store();
+      await Sms.sendTokenSms(phone, code);
 
       console.log('verify code:', code);
       return res.status(200).json({ message: 'Sent code' });
@@ -252,7 +220,7 @@ class UserController {
     }
   }
 
-  async checkCode(req: Request, res: Response) {
+  async checkCodePassword(req: Request, res: Response) {
     try {
       const { email, phone, code } = await UserValidator.checkCode(req.body);
 
@@ -266,7 +234,35 @@ class UserController {
           .json({ message: 'Email or phone must be provided' });
       }
 
-      return res.status(200).json({ message: 'User verified' });
+      return res.status(200).json({message: 'code validate'})
+
+    } catch (error) {
+      console.log('UserController checkCode error', error);
+
+      if (error instanceof EntityNotFoundError)
+        return res.status(404).json({ message: 'User not found', error });
+
+      if (error instanceof Yup.ValidationError) {
+        return res.status(400).json({
+          received: {
+            ...error.value,
+          },
+          error: error.errors,
+        });
+      }
+
+      return res.status(500).json({ error });
+    }
+  }
+
+  async checkCode(req: Request, res: Response) {
+    try {
+      const { code } = await UserValidator.checkCode(req.body);
+
+
+      await UserTokenRepository.getById(code);
+
+      return res.status(200).json({ message: 'Code verified' });
     } catch (error) {
       console.log('UserController checkCode error', error);
 
@@ -315,7 +311,7 @@ class UserController {
             name: user.fullName,
             address: email,
           },
-          'mami - nova senha'
+          'Go Boat - nova senha'
         );
       } else if (phone) {
         code = await UserRepository.generateCode(phone, 'phone');

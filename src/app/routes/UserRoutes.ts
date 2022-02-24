@@ -18,24 +18,22 @@ class UserRoutes {
       .route('/users')
       .post(this.multer.single('profileImage'), UserController.store);
 
-    this.router.route('/users/signin').post(UserController.signIn);
+    this.router.route('/signup/sendCode').post(UserController.generateCode);
+    this.router.route('/signup/validateCode').post(UserController.checkCode);
 
-    // this.router
-    //   .route('/users/feed')
-    //   .get(AuthMiddleware.user, UserController.feed);
+    this.router.route('/signin').post(UserController.signIn);
 
 
-    // this.router.route('/users/verify/send').post(UserController.generateCode);
+    this.router
+      .route('/forgot/send')
+      .post(UserController.sendResetPassword);
+    this.router.route('/forgot/validate').post(UserController.checkCodePassword);
 
-    // this.router.route('/users/verify/confirm').post(UserController.checkCode);
 
-    // this.router
-    //   .route('/users/reset-password')
-    //   .post(UserController.resetPassword);
+    this.router
+      .route('/forgot/reset')
+      .post(UserController.resetPassword);
 
-    // this.router
-    //   .route('/users/reset-password/send')
-    //   .post(UserController.sendResetPassword);
 
     // this.router
     //   .route('/users/reset-password/code-verify')

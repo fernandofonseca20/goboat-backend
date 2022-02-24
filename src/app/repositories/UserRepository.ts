@@ -7,7 +7,7 @@ import {
   Not
 } from 'typeorm';
 import { IUser } from '@interfaces';
-import { User } from '@models';
+import { User, UserTokens } from '@models';
 import { Code } from '@utils';
 
 class UserRepository {

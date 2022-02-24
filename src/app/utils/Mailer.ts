@@ -28,13 +28,7 @@ class Mailer {
       to,
       subject,
       html: parsedTemplate(variables),
-      attachments: [
-        {
-          filename: 'logo.png',
-          path:__dirname + '/logo.png',
-          cid: 'logo',
-        },
-      ],
+      
     });
   }
 }
