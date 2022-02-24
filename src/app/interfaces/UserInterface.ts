@@ -15,3 +15,7 @@ export interface IUser {
   acceptedPrivacyPolicy?: boolean;
   boatCategories?: number[],
 }
+export interface ILessee {
+  id?: number;
+  user: number;
+}

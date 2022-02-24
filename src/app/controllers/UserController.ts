@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { EntityNotFoundError } from 'typeorm';
 import path from 'path';
 import * as Yup from 'yup';
-import { User } from '@models';
+import { User, Lessee } from '@models';
 import { Mailer, Sms, Storage, Token } from '@utils';
 import { UserValidator } from '@validators';
 
@@ -10,7 +10,8 @@ import {
   UserRepository,
   UserExperienceRepository,
   BoatCategoryRepository,
-  UserTokenRepository
+  UserTokenRepository,
+  LesseeRepository,
 } from '@repositories';
 
 class UserController {
@@ -79,6 +80,36 @@ class UserController {
           },
           error: error.errors,
         });
+
+      return res.status(500).json({ message: error.message, error });
+    }
+  }
+
+  async updateToLessee(req: Request, res: Response): Promise<Response> {
+    try {
+      const authUser = req.body.user;
+
+      const user: User = await UserRepository.getById(+authUser.id);
+      const lesseExist: Lessee = await LesseeRepository.getById(+user.id);
+
+      if (lesseExist) {
+        return res.status(401).json({ message: 'lessee already exists' })
+      }
+
+      const lessee = await LesseeRepository.store({ user: user.id });
+
+      return res.status(200).json({
+        user: {
+          typeUser: 'lessee',
+          user,
+          lessee
+        }
+      });
+    } catch (error) {
+      console.log('UserController getById error', error);
+
+      if (error instanceof EntityNotFoundError)
+        return res.status(404).json({ message: 'User not found', error });
 
       return res.status(500).json({ message: error.message, error });
     }
@@ -234,7 +265,7 @@ class UserController {
           .json({ message: 'Email or phone must be provided' });
       }
 
-      return res.status(200).json({message: 'code validate'})
+      return res.status(200).json({ message: 'code validate' })
 
     } catch (error) {
       console.log('UserController checkCode error', error);

@@ -33,6 +33,9 @@ class UserRoutes {
     this.router
       .route('/forgot/reset')
       .post(UserController.resetPassword);
+    this.router
+      .route('/users/updateToLessee')
+      .post(AuthMiddleware.user, UserController.updateToLessee);
 
 
     // this.router
