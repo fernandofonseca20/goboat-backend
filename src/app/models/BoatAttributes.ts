@@ -1,45 +1,41 @@
 import {
-  BeforeInsert,
   Column,
-  JoinColumn,
   CreateDateColumn,
   Entity,
-  OneToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
+  OneToMany,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 
-import {
-  User,
-  Boat,
-} from './index';
+import { Boat } from './index';
 
-@Entity({ name: 'Lessee' })
-export class Lessee {
-  
+@Entity({ name: 'BoatAttributes' })
+export class BoatAttributes {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @OneToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn()
-  user: User | number;
+  @Column('varchar', {
+    name: 'title',
+  })
+  title: string;
 
-  
-  @OneToMany(() => Boat, (boat) => boat.lessee, {
+  @ManyToOne(() => Boat, (boat) => boat.boatAttributes, {
     onDelete: 'CASCADE',
   })
-  boats: Boat[];
+  boat?: Boat | number;
 
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamptz',
+    select: false,
   })
   createdAt: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamptz',
+    select: false,
   })
   updatedAt: Date;
 }

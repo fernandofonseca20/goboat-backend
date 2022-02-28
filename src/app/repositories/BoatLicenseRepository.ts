@@ -1,10 +1,10 @@
 import { getConnection, Connection, QueryRunner, In } from 'typeorm';
-import { BoatCategory } from '@models';
-import { IBoatCategory } from '@interfaces';
+import { BoatLicense } from '@models';
+import { IBoatLicense } from '@interfaces';
 import { StringFormatter } from '@utils';
 
-class BoatCategoryRepository {
-  async store(body: IBoatCategory): Promise<BoatCategory | string> {
+class BoatLicenseRepository {
+  async store(body: IBoatLicense): Promise<BoatLicense | string> {
     const connection: Connection = getConnection();
     const queryRunner: QueryRunner = connection.createQueryRunner();
 
@@ -14,29 +14,29 @@ class BoatCategoryRepository {
     try {
       const { title } = body;
 
-      const boatCategoryTitle = StringFormatter.capitalizeFirstLetter(title);
+      const boatLicenseTitle = StringFormatter.capitalizeFirstLetter(title);
 
-      const interestAlreadyExists = await queryRunner.manager.findOne(
-        BoatCategory,
+      const licenseAlreadyExists = await queryRunner.manager.findOne(
+        BoatLicense,
         {
-          title: boatCategoryTitle,
+          title: boatLicenseTitle,
         }
       );
 
-      if (interestAlreadyExists) {
+      if (licenseAlreadyExists) {
         await queryRunner.release();
-        return 'BoatCategory already exists';
+        return 'BoatLicense already exists';
       }
 
-      const interest = queryRunner.manager.create(BoatCategory, {
-        title: boatCategoryTitle,
+      const license = queryRunner.manager.create(BoatLicense, {
+        title: boatLicenseTitle,
       });
 
-      await queryRunner.manager.save(interest);
+      await queryRunner.manager.save(license);
 
       await queryRunner.commitTransaction();
 
-      return interest;
+      return license;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -51,8 +51,8 @@ class BoatCategoryRepository {
 
     await queryRunner.connect();
 
-    const [interests, total]: [BoatCategory[], number] =
-      await queryRunner.manager.findAndCount(BoatCategory, {
+    const [licenses, total]: [BoatLicense[], number] =
+      await queryRunner.manager.findAndCount(BoatLicense, {
         order: {
           createdAt: 'ASC',
         },
@@ -63,7 +63,7 @@ class BoatCategoryRepository {
     await queryRunner.release();
 
     return {
-      interests,
+      licenses,
       total: {
         items: total,
         pages: total > +itemsPerPage ? total / +itemsPerPage : total,
@@ -73,25 +73,25 @@ class BoatCategoryRepository {
     };
   }
 
-  async getById(id: number): Promise<BoatCategory> {
+  async getById(id: number): Promise<BoatLicense> {
     const connection: Connection = getConnection();
     const queryRunner: QueryRunner = connection.createQueryRunner();
 
     await queryRunner.connect();
 
     try {
-      const interest = await queryRunner.manager.findOne(BoatCategory, id);
+      const license = await queryRunner.manager.findOne(BoatLicense, id);
 
-      return interest;
+      return license;
     } catch (error) {
-      console.log('BoatCategoryRepository getById error', error);
+      console.log('BoatLicenseRepository getById error', error);
       throw error;
     } finally {
       await queryRunner.release();
     }
   }
 
-  async update(id: number, body: IBoatCategory): Promise<BoatCategory | string> {
+  async update(id: number, body: IBoatLicense): Promise<BoatLicense | string> {
     const connection: Connection = getConnection();
     const queryRunner: QueryRunner = connection.createQueryRunner();
 
@@ -101,36 +101,36 @@ class BoatCategoryRepository {
     try {
       const { title } = body;
 
-      const interestExists = await queryRunner.manager.findOneOrFail(
-        BoatCategory,
+      const licenseExists = await queryRunner.manager.findOneOrFail(
+        BoatLicense,
         id
       );
 
       if (Object.keys(body).length === 0 && Object.getPrototypeOf(body)) {
         await queryRunner.release();
-        return interestExists;
+        return licenseExists;
       }
 
-      const boatCategoryTitle = StringFormatter.capitalizeFirstLetter(title);
+      const boatLicenseTitle = StringFormatter.capitalizeFirstLetter(title);
 
-      const titleIsUnavailable = await queryRunner.manager.findOne(BoatCategory, {
-        title: boatCategoryTitle,
+      const titleIsUnavailable = await queryRunner.manager.findOne(BoatLicense, {
+        title: boatLicenseTitle,
       });
 
       if (titleIsUnavailable) {
         await queryRunner.release();
-        return 'Already has one interest with this title';
+        return 'Already has one license with this title';
       }
 
-      await queryRunner.manager.update(BoatCategory, id, {
-        title: boatCategoryTitle,
+      await queryRunner.manager.update(BoatLicense, id, {
+        title: boatLicenseTitle,
       });
 
       await queryRunner.commitTransaction();
 
-      const interest = await queryRunner.manager.findOneOrFail(BoatCategory, id);
+      const license = await queryRunner.manager.findOneOrFail(BoatLicense, id);
 
-      return interest;
+      return license;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -147,13 +147,13 @@ class BoatCategoryRepository {
     await queryRunner.startTransaction();
 
     try {
-      await queryRunner.manager.findOneOrFail(BoatCategory, id);
+      await queryRunner.manager.findOneOrFail(BoatLicense, id);
 
-      await queryRunner.manager.delete(BoatCategory, id);
+      await queryRunner.manager.delete(BoatLicense, id);
 
       await queryRunner.commitTransaction();
 
-      return 'BoatCategory has been deleted';
+      return 'BoatLicense has been deleted';
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -168,24 +168,24 @@ class BoatCategoryRepository {
 
     await queryRunner.connect();
 
-    const interestIds: number[] = [];
+    const licenseIds: number[] = [];
 
-    const interests = await queryRunner.manager.find(BoatCategory, {
+    const licenses = await queryRunner.manager.find(BoatLicense, {
       where: { id: In(ids) },
     });
 
-    interests.forEach((interest) => interestIds.push(interest.id));
+    licenses.forEach((license) => licenseIds.push(license.id));
 
     await queryRunner.release();
 
-    return interestIds;
+    return licenseIds;
   }
-  async listActives() : Promise<BoatCategory[]> {
+  async listActives() : Promise<BoatLicense[]> {
     const connection: Connection = getConnection();
     const queryRunner: QueryRunner = connection.createQueryRunner();
 
     await queryRunner.connect();
-    const boatCategories = await queryRunner.manager.find(BoatCategory, {
+    const boatCategories = await queryRunner.manager.find(BoatLicense, {
       where: {
         actived: true
       }
@@ -195,4 +195,4 @@ class BoatCategoryRepository {
   }
 }
 
-export default new BoatCategoryRepository();
+export default new BoatLicenseRepository();

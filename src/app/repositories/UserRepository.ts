@@ -11,7 +11,7 @@ import { User, UserTokens } from '@models';
 import { Code } from '@utils';
 
 class UserRepository {
-  private relations: string[] = [];
+  private relations: string[] = ['lessee'];
 
   async store(body: IUser): Promise<User> {
     const connection: Connection = getConnection();

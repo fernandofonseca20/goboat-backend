@@ -4,14 +4,18 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  JoinColumn,
+  JoinTable,
 } from 'typeorm';
 import { compare, hash } from 'bcrypt';
 
 import {
-UserExperience
+  UserExperience,
+  Lessee
 } from './index';
 
 @Entity({ name: 'Users' })
@@ -61,7 +65,7 @@ export class User {
   })
   profileImage?: string;
 
- 
+
   @Column('varchar', {
     name: 'phone',
     nullable: true,
@@ -77,6 +81,7 @@ export class User {
   @Column('boolean', {
     name: 'validated_phone',
     default: false,
+    select: false,
   })
   validatedPhone?: boolean;
 
@@ -86,7 +91,12 @@ export class User {
   })
   code?: number | null;
 
-  
+
+  @OneToOne(() => Lessee)
+  @JoinColumn()
+  lessee: Lessee | number;
+
+
   @OneToMany(() => UserExperience, (userExperience) => userExperience.user, {
     onDelete: 'CASCADE',
   })

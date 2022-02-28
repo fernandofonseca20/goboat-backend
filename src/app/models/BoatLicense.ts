@@ -5,13 +5,12 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
   UpdateDateColumn,
-  ManyToOne,
 } from 'typeorm';
 
-import { UserExperience, Boat } from './index';
+import { Boat } from './index';
 
-@Entity({ name: 'BoatCategory' })
-export class BoatCategory {
+@Entity({ name: 'BoatLicense' })
+export class BoatLicense {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
@@ -20,6 +19,16 @@ export class BoatCategory {
   })
   title: string;
 
+  @Column('varchar', {
+    name: 'acronym',
+  })
+  acronym: string;
+
+  @Column('varchar', {
+    name: 'description',
+  })
+  description: string;
+
   @Column('boolean', {
     name: 'actived',
     default: true,
@@ -27,18 +36,14 @@ export class BoatCategory {
   })
   actived: boolean;
 
-  @Column({
-    name: 'imageUrl',
-    nullable: true
+  @Column('integer', {
+    name: 'nivel',
+    select: false,
   })
-  imageUrl: string;
+  nivel: number;
 
-  @OneToMany(() => UserExperience, (userExperience) => userExperience.boatCategory, {
-    onDelete: 'CASCADE',
-  })
-  userExperiences?: UserExperience[];
 
-  @ManyToOne(() => Boat, (userExperience) => userExperience.boatCategory, {
+  @OneToMany(() => Boat, (boat) => boat.license, {
     onDelete: 'CASCADE',
   })
   boats?: Boat[];

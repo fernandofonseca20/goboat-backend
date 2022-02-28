@@ -1,5 +1,5 @@
 import { getConnection, Connection, QueryRunner, In } from 'typeorm';
-import { Lessee } from '@models';
+import { Lessee, User } from '@models';
 import { ILessee } from '@interfaces';
 import { StringFormatter } from '@utils';
 
@@ -30,6 +30,11 @@ class LesseeRepository {
       });
 
       await queryRunner.manager.save(lessee);
+
+      
+      await queryRunner.manager.update(User, body.user, {
+        lessee: lessee.id,
+      });
 
       await queryRunner.commitTransaction();
 
@@ -71,6 +76,25 @@ class LesseeRepository {
   }
 
   async getById(id: number): Promise<Lessee> {
+    const connection: Connection = getConnection();
+    const queryRunner: QueryRunner = connection.createQueryRunner();
+
+    await queryRunner.connect();
+
+    try {
+      const interest = await queryRunner.manager.findOne(Lessee, {
+        user: id
+      });
+
+      return interest;
+    } catch (error) {
+      console.log('LesseeRepository getById error', error);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+  async getByUserId(id: number): Promise<Lessee> {
     const connection: Connection = getConnection();
     const queryRunner: QueryRunner = connection.createQueryRunner();
 

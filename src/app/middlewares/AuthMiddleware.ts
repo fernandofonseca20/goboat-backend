@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { EntityNotFoundError } from 'typeorm';
 import * as Yup from 'yup';
 import { Token } from '@utils';
-import { UserRepository } from '@repositories';
+import { UserRepository, LesseeRepository } from '@repositories';
 import { User } from '@models';
 
 import { Socket } from 'socket.io';
@@ -48,6 +48,51 @@ class AuthMiddleware {
       return res.status(500).json({ error });
     }
   }
+  async lessee(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    const userSchema = Yup.object().shape({
+      authorization: Yup.string().required(),
+    });
+
+    try {
+      const { authorization } = await userSchema.validate(req.headers);
+
+      const [bearer, token] = authorization.split(' ');
+
+      if (bearer !== 'Bearer')
+        return res.status(401).json({ message: 'Token mal-formatted' });
+
+      const user = Token.decode(token);
+
+      if (user.class !== 'user')
+        return res.status(401).json({ message: 'Invalid token' });
+
+
+      req.body.user = await UserRepository.getById(user.id);
+      
+
+      if (!req.body.user.lessee)
+        return res.status(401).json({ message: 'User not authorized' });
+
+      return next();
+    } catch (error) {
+      console.log(error);
+
+      if (error instanceof Yup.ValidationError) {
+        return res
+          .status(401)
+          .json({ message: 'Authorization was not provided' });
+      }
+
+      if (error instanceof EntityNotFoundError)
+        return res.status(404).json({ message: 'User not found' });
+
+      return res.status(500).json({ error });
+    }
+  }
 
   async userSocket(
     socket: Socket, next
@@ -62,7 +107,7 @@ class AuthMiddleware {
 
       const [bearer, token] = authorization.split(' ');
 
-      if (bearer !== 'Bearer'){
+      if (bearer !== 'Bearer') {
         return next(new Error('Token invalid'));
       }
 
