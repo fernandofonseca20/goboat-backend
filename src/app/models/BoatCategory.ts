@@ -38,7 +38,7 @@ export class BoatCategory {
   })
   userExperiences?: UserExperience[];
 
-  @ManyToOne(() => Boat, (userExperience) => userExperience.boatCategory, {
+  @OneToMany(() => Boat, (userExperience) => userExperience.boatCategory, {
     onDelete: 'CASCADE',
   })
   boats?: Boat[];

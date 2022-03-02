@@ -138,7 +138,7 @@ export class Boat {
   })
   boatAttributes?: BoatAttributes[];
 
-  @OneToMany(() => BoatCategory, (category) => category.boats, {
+  @ManyToOne(() => BoatCategory, (category) => category.boats, {
     onDelete: 'CASCADE',
   })
   boatCategory?: BoatCategory | number;

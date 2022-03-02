@@ -53,3 +53,12 @@ export interface IBoatLicense {
   id: string,
   title: string,
 }
+
+
+export interface IBoatFilter {
+  boatName: string,
+  locationName?: string,
+  boatCategory?: number,
+  amountOfPeople?: number,
+  daily: number
+}

@@ -1,6 +1,6 @@
 import { getConnection, Connection, QueryRunner, In } from 'typeorm';
 import { Boat, BoatAttributes } from '@models';
-import { IBoatStore } from '@interfaces';
+import { IBoatStore, IBoatFilter } from '@interfaces';
 import { StringFormatter } from '@utils';
 
 class BoatRepository {
@@ -123,6 +123,51 @@ class BoatRepository {
       await queryRunner.commitTransaction();
 
       return 'Boat has been deleted';
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async search(filters: IBoatFilter, page: number = 0, itemsPerPage: number = 10): Promise<{
+    rows: Boat[],
+    totalItems: number,
+    page: number,
+    itemsPerPage: number
+  }> {
+    const connection: Connection = getConnection();
+    const queryRunner: QueryRunner = connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+
+      const { boatName, locationName, boatCategory, amountOfPeople, daily } = filters;
+      const boatQuery = queryRunner.manager
+        .createQueryBuilder(Boat, 'boat');
+
+      if (boatName) boatQuery.where(' "boat"."name" ILike :name ', { name: `%${boatName}%` });
+      if (locationName) boatQuery.where(' "boat"."beach" ILike :beach ', { beach: `%${locationName}%` });
+      if (boatCategory) boatQuery.where(' "boat"."boatCategoryId" = :boatCategory ', { boatCategory: boatCategory });
+      if (amountOfPeople) boatQuery.where(' "boat"."maximumCapacity" = :amountOfPeople ', { amountOfPeople: amountOfPeople });
+
+      const totalItems = await boatQuery.getCount();
+      const rows = await boatQuery
+        .take(itemsPerPage)
+        .skip((page * itemsPerPage) || 0)
+        .getMany();
+
+      await queryRunner.commitTransaction();
+
+      return {
+        rows,
+        totalItems,
+        page,
+        itemsPerPage
+      };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

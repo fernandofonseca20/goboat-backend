@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { IBoatStore } from '@interfaces';
+import { IBoatStore, IBoatFilter } from '@interfaces';
 
 import moment from 'moment';
 
@@ -26,21 +26,21 @@ class BoatValidator {
       boatAttributes: Yup.array().of(Yup.string()),
       boatPackage: Yup.array().of(Yup.string()),
       chekinHour: Yup.string()
-      .test(
-        'not empty',
-        'Start time cant be empty',
-        function(value) {
-          return !!value;
-        }
-      )
-      .test(
-        "start_time_test",
-        "Start time must be before end time",
-        function(value) {
-          const { checkoutHour } = this.parent;
-          return isSameOrBefore(value, checkoutHour);
-        }
-      ),
+        .test(
+          'not empty',
+          'Start time cant be empty',
+          function (value) {
+            return !!value;
+          }
+        )
+        .test(
+          "start_time_test",
+          "Start time must be before end time",
+          function (value) {
+            const { checkoutHour } = this.parent;
+            return isSameOrBefore(value, checkoutHour);
+          }
+        ),
       checkoutHour: Yup.string(),
     }
     );
@@ -58,6 +58,20 @@ class BoatValidator {
 
   //   return body;
   // }
+
+  async search(obj: object): Promise<IBoatFilter> {
+    const schema = Yup.object().shape({
+      boatName: Yup.string().required(),
+      locationName: Yup.string(),
+      boatCategory: Yup.number(),
+      amountOfPeople: Yup.number(),
+      daily: Yup.number().required(),
+    });
+
+    const body: IBoatFilter = await schema.validate(obj);
+
+    return body;
+  }
 
 }
 

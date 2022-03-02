@@ -88,6 +88,7 @@ export class User {
   @Column('int', {
     name: 'code',
     nullable: true,
+    select: false,
   })
   code?: number | null;
 

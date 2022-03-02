@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { BoatController } from '@controllers';
 import multer, { Multer } from 'multer';
 
-import {AuthMiddleware} from '@middlewares';
+import { AuthMiddleware } from '@middlewares';
 
 class BoatRoutes {
   public router: Router;
@@ -25,6 +25,10 @@ class BoatRoutes {
     this.router
       .route('/boats/attributes')
       .get(AuthMiddleware.lessee, BoatController.attributesDefault);
+
+    this.router
+      .route('/boats/search')
+      .post(AuthMiddleware.user, BoatController.search);
 
     return this.router;
   }
