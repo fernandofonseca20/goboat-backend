@@ -72,6 +72,48 @@ export class User {
   })
   phone?: string;
 
+  @Column('varchar', {
+    name: 'addressCep',
+    nullable: true,
+  })
+  addressCep?: string;
+
+  @Column('varchar', {
+    name: 'addressStreet',
+    nullable: true,
+  })
+  addressStreet?: string;
+
+  @Column('varchar', {
+    name: 'addressNumber',
+    nullable: true,
+  })
+  addressNumber?: string;
+
+  @Column('varchar', {
+    name: 'addressComplement',
+    nullable: true,
+  })
+  addressComplement?: string;
+
+  @Column('varchar', {
+    name: 'addressDistrict',
+    nullable: true,
+  })
+  addressDistrict?: string;
+
+  @Column('varchar', {
+    name: 'addressCity',
+    nullable: true,
+  })
+  addressCity?: string;
+
+  @Column('varchar', {
+    name: 'addressState',
+    nullable: true,
+  })
+  addressState?: string;
+
   @Column('boolean', {
     name: 'validated_email',
     default: false,

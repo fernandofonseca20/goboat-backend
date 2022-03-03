@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { IUser } from '@interfaces';
+import { IUser, IUserUpdate } from '@interfaces';
 
 class UserValidator {
   async store(obj: object): Promise<IUser> {
@@ -23,19 +23,24 @@ class UserValidator {
     return body;
   }
 
-  async update(obj: object): Promise<IUser> {
+  async update(obj: object): Promise<IUserUpdate> {
     const schema = Yup.object().shape({
       email: Yup.string().email(),
-      password: Yup.string().min(8).max(16),
       firstName: Yup.string(),
       lastName: Yup.string(),
       documentNumber: Yup.string(),
       phone: Yup.string(),
       bornDate: Yup.date(),
-      boatCategories: Yup.array().of(Yup.number()),
+      addressCep: Yup.string(),
+      addressStreet: Yup.string(),
+      addressNumber: Yup.string(),
+      addressComplement: Yup.string(),
+      addressDistrict: Yup.string(),
+      addressCity: Yup.string(),
+      addressState: Yup.string(),
     });
 
-    const body: IUser = await schema.validate(obj);
+    const body: IUserUpdate = await schema.validate(obj);
 
     return body;
   }

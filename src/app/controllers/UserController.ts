@@ -117,9 +117,9 @@ class UserController {
 
   async getById(req: Request, res: Response): Promise<Response> {
     try {
-      const { userId } = req.params;
+      const { user : userAuth } = req.body;
 
-      const user: User = await UserRepository.getById(+userId);
+      const user: User = await UserRepository.getById(+userAuth.id);
 
       return res.status(200).json({
         user: {
@@ -138,14 +138,14 @@ class UserController {
 
   async update(req: Request, res: Response): Promise<Response> {
     try {
-      const { userId } = req.params;
+
+      const { user: userAuth, ...reqBody} = req.body;
       const {
         profileImage,
         ...body
-      } = await UserValidator.update(req.body);
+      } = await UserValidator.update(reqBody);
 
-
-      let user: User = await UserRepository.update(+userId, body);
+      let user: User = await UserRepository.update(+userAuth.id, body);
 
       if (profileImage) {
         const profileImageUrl = await Storage.uploadImg(profileImage, 'profile');

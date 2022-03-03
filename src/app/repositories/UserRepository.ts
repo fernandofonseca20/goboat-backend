@@ -189,7 +189,6 @@ class UserRepository {
     await queryRunner.startTransaction();
 
     try {
-      let password: string;
 
       const { firstName, lastName } = body;
 
@@ -202,24 +201,19 @@ class UserRepository {
         return userExists;
       }
 
-      if (body.password)
-        password = await userExists.hashPassword(body.password);
-
       if (firstName || lastName)
         fullName = `${firstName || userExists.firstName} ${
           lastName || userExists.lastName
         }`;
-      delete body.user;
-      console.log('====================hassons', body)
+
       await queryRunner.manager.update(User, id, {
         ...body,
         fullName,
-        password: password || userExists.password,
       });
-
-      await queryRunner.commitTransaction();
       console.log('body')
       console.log(body)
+
+      await queryRunner.commitTransaction();
       const user: User = await this.getById(id);
 
       return user;

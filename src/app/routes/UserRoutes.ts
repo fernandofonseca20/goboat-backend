@@ -42,13 +42,17 @@ class UserRoutes {
     //   .route('/users/reset-password/code-verify')
     //   .post(UserController.checkPasswordCode);
 
-    // this.router
-    //   .route('/users/:userId')
-    //   .get(AuthMiddleware.user, UserController.getById)
-    //   .put(
-    //     AuthMiddleware.user,
-    //     UserController.update
-    //   )
+    this.router
+      .route('/users')
+      .get(AuthMiddleware.user, UserController.getById)
+      .put(
+        AuthMiddleware.user,
+        UserController.update
+      )
+      .patch(
+        AuthMiddleware.user,
+        UserController.update
+      )
     //   .delete(AuthMiddleware.user, UserController.destroy);
 
     return this.router;
