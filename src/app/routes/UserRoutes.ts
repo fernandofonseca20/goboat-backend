@@ -29,18 +29,19 @@ class UserRoutes {
       .post(UserController.sendResetPassword);
     this.router.route('/forgot/validate').post(UserController.checkCodePassword);
 
-
     this.router
       .route('/forgot/reset')
       .post(UserController.resetPassword);
+
+    this.router
+      .route('/users/saves')
+      .get(AuthMiddleware.user, UserController.listSaves)
+      .post(AuthMiddleware.user, UserController.storeSave);
+
+
     this.router
       .route('/users/updateToLessee')
       .post(AuthMiddleware.user, UserController.updateToLessee);
-
-
-    // this.router
-    //   .route('/users/reset-password/code-verify')
-    //   .post(UserController.checkPasswordCode);
 
     this.router
       .route('/users')

@@ -16,6 +16,7 @@ import {
   BoatLicense,
   BoatAttributes,
   BoatCategory,
+  UserSaves,
 } from './index';
 
 @Entity({ name: 'Boat' })
@@ -143,7 +144,11 @@ export class Boat {
     onDelete: 'CASCADE',
   })
   boatCategory?: BoatCategory | number;
- 
+  
+  @OneToMany(() => UserSaves, (saves) => saves.boat, {
+    onDelete: 'CASCADE',
+  })
+  userSaves?: UserSaves[];
 
   @CreateDateColumn({
     name: 'created_at',

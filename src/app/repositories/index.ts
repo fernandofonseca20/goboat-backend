@@ -6,6 +6,7 @@ import LesseeRepository from './LesseeRepository';
 import BoatRepository from './BoatRepository';
 import BoatLicenseRepository from './BoatLicenseRepository';
 import BoatAttributesDefatult from './BoatAttributesDefatult';
+import UserSavesRepository from './UserSavesRepository';
 
 export {
   UserRepository,
@@ -16,4 +17,5 @@ export {
   BoatRepository,
   BoatLicenseRepository,
   BoatAttributesDefatult,
+  UserSavesRepository,
 };

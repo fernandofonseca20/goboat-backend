@@ -8,3 +8,4 @@ export * from './Boat';
 export * from './BoatLicense';
 export * from './BoatAttributesDefaults';
 export * from './BoatAttributes';
+export * from './UserSaves';

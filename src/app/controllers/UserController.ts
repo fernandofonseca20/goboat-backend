@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { EntityNotFoundError } from 'typeorm';
 import path from 'path';
 import * as Yup from 'yup';
-import { User, Lessee } from '@models';
+import { User, Lessee, UserSaves } from '@models';
 import { Mailer, Sms, Storage, Token } from '@utils';
 import { UserValidator } from '@validators';
 
@@ -12,6 +12,8 @@ import {
   BoatCategoryRepository,
   UserTokenRepository,
   LesseeRepository,
+  UserSavesRepository,
+  BoatRepository,
 } from '@repositories';
 
 class UserController {
@@ -117,7 +119,7 @@ class UserController {
 
   async getById(req: Request, res: Response): Promise<Response> {
     try {
-      const { user : userAuth } = req.body;
+      const { user: userAuth } = req.body;
 
       const user: User = await UserRepository.getById(+userAuth.id);
 
@@ -139,7 +141,7 @@ class UserController {
   async update(req: Request, res: Response): Promise<Response> {
     try {
 
-      const { user: userAuth, ...reqBody} = req.body;
+      const { user: userAuth, ...reqBody } = req.body;
       const {
         profileImage,
         ...body
@@ -451,6 +453,59 @@ class UserController {
       return res.status(500).json({ error });
     }
   }
+
+  async listSaves(req: Request, res: Response) {
+    try {
+      const { user: userAuth } = req.body;
+
+      const saves = await UserSavesRepository.getUserSaves(+userAuth.id);
+
+      return res.status(200).json(saves);
+
+    } catch (error) {
+      console.log('UserController checkCode error', error);
+
+      return res.status(500).json({ message: error.message, error });
+    }
+  }
+
+  async storeSave(req: Request, res: Response) {
+    try {
+      const { user: userAuth } = req.body;
+
+      const { boatId } = req.body;
+
+      if (!boatId) {
+        return res.status(400).json({ message: 'Send boatId' })
+      }
+
+      const boat = await BoatRepository.getById(+boatId);
+
+      if (!boat) {
+        return res.status(400).json({ message: 'Boat not exist' })
+      }
+
+      const existSave = await UserSavesRepository.existSave(+userAuth.id, +boatId);
+
+      if (!existSave) {
+        const save = await UserSavesRepository.storeSave(+userAuth.id, +boatId);
+        return res.status(201).json(save);
+      }
+      else if (typeof existSave !== 'boolean') {
+        const save = await UserSavesRepository.destroySave(existSave.id);
+        return res.status(200).json(save);
+
+      }
+
+
+    } catch (error) {
+      console.log('UserController checkCode error', error);
+
+      return res.status(500).json({ message: error.message, error });
+    }
+  }
+
+
 
 }
 
