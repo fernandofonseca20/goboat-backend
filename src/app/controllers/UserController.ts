@@ -458,7 +458,9 @@ class UserController {
     try {
       const { user: userAuth } = req.body;
 
-      const saves = await UserSavesRepository.getUserSaves(+userAuth.id);
+      const { categoryId } = req.query;
+
+      const saves = await UserSavesRepository.getUserSaves(+userAuth.id, +categoryId);
 
       return res.status(200).json(saves);
 

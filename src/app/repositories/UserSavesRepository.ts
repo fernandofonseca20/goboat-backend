@@ -7,19 +7,22 @@ import { UserSaves } from '@models';
 
 class UserSavesRepository {
 
-  async getUserSaves(userId: number) {
+  async getUserSaves(userId: number, categoryId: number | undefined): Promise<UserSaves[]> {
     const connection: Connection = getConnection();
     const queryRunner: QueryRunner = connection.createQueryRunner();
 
     await queryRunner.connect();
 
-    const userSaves = await queryRunner.manager.find(UserSaves, {
-      where: {
-        user: userId
-      },
-      relations: ['boat']
-    });
+    const userSavesQuery = queryRunner.manager
+      .createQueryBuilder(UserSaves, 'userSaves')
+      .leftJoinAndSelect("userSaves.boat", "boat");
 
+    userSavesQuery.where('userSaves.userId = :userId', { userId })
+    if (categoryId) {
+      userSavesQuery.where('boat.boatCategoryId = :categoryId', { categoryId })
+    }
+
+    const userSaves = await userSavesQuery.getMany();
     await queryRunner.release();
 
     return userSaves;
