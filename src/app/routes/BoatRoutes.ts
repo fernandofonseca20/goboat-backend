@@ -29,6 +29,10 @@ class BoatRoutes {
     this.router
       .route('/boats/search')
       .post(AuthMiddleware.user, BoatController.search);
+      
+    this.router
+      .route('/boats/:boatId')
+      .get(AuthMiddleware.user, BoatController.getById); 
 
     return this.router;
   }

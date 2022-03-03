@@ -44,7 +44,8 @@ export class Boat {
 
   @Column({
     name: 'pricePerDay',
-    type: 'decimal',
+    type: 'double precision',
+    default: 0,
   })
   pricePerDay: number;
 
@@ -57,7 +58,7 @@ export class Boat {
 
   @Column({
     name: 'priceOff',
-    type: 'decimal',
+    type: 'double precision',
     nullable: true
   })
   priceOff: number;

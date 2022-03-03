@@ -47,6 +47,20 @@ class BoatController {
     }
   }
 
+  async getById(req: Request, res: Response) {
+    try {
+      const { boatId } = req.params;
+
+      const boat = await BoatRepository.getById(+boatId);
+
+      return res.status(200).json(boat);
+    } catch (error) {
+      console.log('BoatController getById error', error);
+
+      return res.status(500).json({ message: error.message, error });
+    }
+  }
+
   async search(req: Request, res: Response) {
     try {
       const { page, itemsPerPage } = req.query;
@@ -85,6 +99,7 @@ class BoatController {
       return res.status(500).json({ message: error.message, error });
     }
   }
+
   async listLicenseActveds(req: Request, res: Response) {
     try {
       const licenses = await BoatLicenseRepository.listActives();

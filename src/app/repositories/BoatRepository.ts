@@ -5,7 +5,7 @@ import { StringFormatter } from '@utils';
 
 class BoatRepository {
 
-  private relations: string[] = ['lessee', 'lessee.user'];
+  private relations: string[] = ['lessee', 'lessee.user', 'boatAttributes', 'boatCategory', 'license'];
   async store(body: IBoatStore, lesseeId: number): Promise<Boat | string> {
     const connection: Connection = getConnection();
     const queryRunner: QueryRunner = connection.createQueryRunner();
