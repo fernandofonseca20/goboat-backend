@@ -31,7 +31,7 @@ class UserPaymentMethodController {
 
   async getById(req: Request, res: Response) {
     try {
-      const { user: userAuth} = req.body;
+      const { user: userAuth } = req.body;
       const { cardId } = req.params;
 
       const boat = await UserPaymentMethodRepository.getById(+cardId, +userAuth.id);
@@ -45,7 +45,7 @@ class UserPaymentMethodController {
   }
   async update(req: Request, res: Response) {
     try {
-      
+
       const { cardId } = req.params;
 
       const body = await UserPaymentMethodValidator.store(req.body);
@@ -61,11 +61,34 @@ class UserPaymentMethodController {
   }
   async list(req: Request, res: Response) {
     try {
-      const { user: userAuth} = req.body;
+      const { user: userAuth } = req.body;
 
-      const cards = await UserPaymentMethodRepository.list( +userAuth.id);
+      const cards = await UserPaymentMethodRepository.list(+userAuth.id);
 
       return res.status(200).json(cards);
+    } catch (error) {
+      console.log('UserPaymentMethodController getById error', error);
+
+      return res.status(500).json({ message: error.message, error });
+    }
+  }
+  async destroy(req: Request, res: Response) {
+    try {
+      const { user: userAuth } = req.body;
+      const { cardId } = req.params;
+
+      const boat = await UserPaymentMethodRepository.getById(+cardId, +userAuth.id);
+      if (!boat) {
+        return res.status(401).json({ message: 'Card not found' });
+      }
+
+      if (typeof boat.user !== 'number' && !boat.user.id === userAuth.id) {
+        return res.status(401).json({ message: 'Card not found' });
+      }
+
+      const result = await UserPaymentMethodRepository.destroy(+cardId);
+
+      return res.status(200).json(result);
     } catch (error) {
       console.log('UserPaymentMethodController getById error', error);
 

@@ -131,7 +131,7 @@ class UserPaymentMethodRepository {
 
       await queryRunner.commitTransaction();
 
-      return 'UserPaymentMethod has been deleted';
+      return 'Card has been deleted';
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
