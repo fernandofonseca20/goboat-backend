@@ -8,6 +8,8 @@ import BoatLicenseRepository from './BoatLicenseRepository';
 import BoatAttributesDefatult from './BoatAttributesDefatult';
 import UserSavesRepository from './UserSavesRepository';
 import UserPaymentMethodRepository from './UserPaymentMethodRepository';
+import BoatRentRepository from './BoatRentRepository';
+import CouponRepository from './CouponRepository';
 
 export {
   UserRepository,
@@ -20,4 +22,6 @@ export {
   BoatAttributesDefatult,
   UserSavesRepository,
   UserPaymentMethodRepository,
+  BoatRentRepository,
+  CouponRepository,
 };

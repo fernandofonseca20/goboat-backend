@@ -4,6 +4,7 @@ import BoatCategoryController from './BoatCategoryController';
 import HomeController from './HomeController';
 import BoatController from './BoatController';
 import UserPaymentMethodController from './UserPaymentMethodController';
+import BoatRentController from './BoatRentController';
 
 export {
   UserController,
@@ -11,4 +12,5 @@ export {
   HomeController,
   BoatController,
   UserPaymentMethodController,
+  BoatRentController
 };

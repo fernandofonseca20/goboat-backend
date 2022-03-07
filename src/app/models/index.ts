@@ -10,3 +10,5 @@ export * from './BoatAttributesDefaults';
 export * from './BoatAttributes';
 export * from './UserSaves';
 export * from './UserPaymentMethod';
+export * from './Coupon';
+export * from './BoatRents';

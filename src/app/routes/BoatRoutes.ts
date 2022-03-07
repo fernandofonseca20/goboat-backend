@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { BoatController } from '@controllers';
+import { BoatController, BoatRentController } from '@controllers';
 import multer, { Multer } from 'multer';
 
 import { AuthMiddleware } from '@middlewares';
@@ -33,6 +33,16 @@ class BoatRoutes {
     this.router
       .route('/boats/:boatId')
       .get(AuthMiddleware.user, BoatController.getById); 
+    this.router
+      .route('/boats/:boatId/rent')
+      .post(AuthMiddleware.user, BoatRentController.store); 
+
+    this.router
+      .route('/boats/:boatId/rent')
+      .post(AuthMiddleware.user, BoatRentController.store); 
+    this.router
+      .route('/boats/coupon/:couponCode')
+      .get(AuthMiddleware.user, BoatRentController.existCoupon); 
 
     return this.router;
   }

@@ -5,11 +5,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   Column,
+  OneToMany,
 } from 'typeorm';
 
 import {
   User,
-  Boat
+  BoatRents
 } from './index';
 
 @Entity({ name: 'UserPaymentMethod' })
@@ -21,6 +22,8 @@ export class UserPaymentMethod {
   @ManyToOne(() => User, (user) => user.userSaves, { onDelete: 'CASCADE' })
   user: User | number;
 
+  @OneToMany(() => BoatRents, (boat) => boat.card, { onDelete: 'CASCADE' })
+  boatRents: BoatRents[];
 
   @Column({
     name: 'number',
