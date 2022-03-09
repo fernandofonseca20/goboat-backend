@@ -95,11 +95,15 @@ class BoatRentController {
 
   async getById(req: Request, res: Response) {
     try {
-      const { boatId } = req.params;
+      const { boatRentId } = req.params;
 
-      const boat = await BoatRentRepository.getById(+boatId);
+      const boatRent = await BoatRentRepository.getById(+boatRentId);
 
-      return res.status(200).json(boat);
+      if (!boatRent) {
+        return res.status(404).json({ message: 'boatRent not found' });
+      }
+
+      return res.status(200).json(boatRent);
     } catch (error) {
       console.log('BoatRentController getById error', error);
 
