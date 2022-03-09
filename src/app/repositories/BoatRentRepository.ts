@@ -32,32 +32,26 @@ class BoatRentRepository {
     }
   }
 
-  async list(page: number, itemsPerPage: number): Promise<object> {
+  async listByLesse(lesseeId: number): Promise<object> {
     const connection: Connection = getConnection();
     const queryRunner: QueryRunner = connection.createQueryRunner();
 
     await queryRunner.connect();
 
-    const [interests, total]: [BoatRents[], number] =
-      await queryRunner.manager.findAndCount(BoatRents, {
-        order: {
-          createdAt: 'ASC',
+    const rows: BoatRents[]=
+      await queryRunner.manager.find(BoatRents, {
+        where:{
+          'boat.lessee': lesseeId
         },
-        take: +itemsPerPage,
-        skip: +page * +itemsPerPage,
+        order: {
+          createdAt: 'DESC',
+        },
+        relations: ['boat', 'boat.lessee']
       });
 
     await queryRunner.release();
 
-    return {
-      interests,
-      total: {
-        items: total,
-        pages: total > +itemsPerPage ? total / +itemsPerPage : total,
-      },
-      currentPage: +page,
-      itemsPerPage: +itemsPerPage,
-    };
+    return rows;
   }
 
   async listByUser(userId: number): Promise<object> {

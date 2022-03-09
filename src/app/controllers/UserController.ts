@@ -500,7 +500,6 @@ class UserController {
 
       }
 
-
     } catch (error) {
       console.log('UserController checkCode error', error);
 
@@ -513,6 +512,21 @@ class UserController {
       const { user: userAuth } = req.body;
       
       const boatRents = await BoatRentRepository.listByUser(userAuth.id);
+
+      return res.json(boatRents);
+
+    } catch (error) {
+      console.log('UserController checkCode error', error);
+
+      return res.status(500).json({ message: error.message, error });
+    }
+  }
+
+  async lesseeListBoatRents(req: Request, res: Response) {
+    try {
+      const { user: userAuth } = req.body;
+      
+      const boatRents = await BoatRentRepository.listByLesse(userAuth.lessee.id);
 
       return res.json(boatRents);
 

@@ -77,7 +77,11 @@ class UserRoutes {
     this.router
       .route('/users/rents')
       .get(AuthMiddleware.user, UserController.listBoatRents);
-    //   .delete(AuthMiddleware.user, UserController.destroy);
+
+    this.router
+      .route('/lessees/rents')
+      .get(AuthMiddleware.lessee, UserController.lesseeListBoatRents);
+    // .delete(AuthMiddleware.user, UserController.destroy);
 
     return this.router;
   }
