@@ -60,6 +60,27 @@ class BoatRentRepository {
     };
   }
 
+  async listByUser(userId: number): Promise<object> {
+    const connection: Connection = getConnection();
+    const queryRunner: QueryRunner = connection.createQueryRunner();
+
+    await queryRunner.connect();
+
+    const rows: BoatRents[] =
+      await queryRunner.manager.find(BoatRents, {
+        where:{
+          user: userId,
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+
+    await queryRunner.release();
+
+    return rows;
+  }
+
   async getById(id: number): Promise<BoatRents> {
     const connection: Connection = getConnection();
     const queryRunner: QueryRunner = connection.createQueryRunner();

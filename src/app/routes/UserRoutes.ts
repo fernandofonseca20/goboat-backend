@@ -72,7 +72,11 @@ class UserRoutes {
       .patch(
         AuthMiddleware.user,
         UserController.update
-      )
+      );
+
+    this.router
+      .route('/users/rents')
+      .get(AuthMiddleware.user, UserController.listBoatRents);
     //   .delete(AuthMiddleware.user, UserController.destroy);
 
     return this.router;

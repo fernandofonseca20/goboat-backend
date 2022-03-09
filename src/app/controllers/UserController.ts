@@ -14,6 +14,7 @@ import {
   LesseeRepository,
   UserSavesRepository,
   BoatRepository,
+  BoatRentRepository,
 } from '@repositories';
 
 class UserController {
@@ -507,7 +508,20 @@ class UserController {
     }
   }
 
+  async listBoatRents(req: Request, res: Response) {
+    try {
+      const { user: userAuth } = req.body;
+      
+      const boatRents = await BoatRentRepository.listByUser(userAuth.id);
 
+      return res.json(boatRents);
+
+    } catch (error) {
+      console.log('UserController checkCode error', error);
+
+      return res.status(500).json({ message: error.message, error });
+    }
+  }
 
 }
 
