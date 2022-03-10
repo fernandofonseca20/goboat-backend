@@ -7,6 +7,7 @@ import UserPaymentMethodController from './UserPaymentMethodController';
 import BoatRentController from './BoatRentController';
 import LesseeController from './LesseeController';
 import LesseeReceivingDataController from './LesseeReceivingDataController';
+import ChatController from './ChatController';
 
 export {
   UserController,
@@ -17,4 +18,5 @@ export {
   BoatRentController,
   LesseeController,
   LesseeReceivingDataController,
+  ChatController
 };

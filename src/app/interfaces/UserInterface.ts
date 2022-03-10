@@ -47,6 +47,10 @@ export interface ILessee {
   id?: number;
   user: number;
 }
+export interface ILesseeUser {
+  id?: number;
+  user: IUser;
+}
 export interface ILesseeReceivingData {
   type: string | 'pix' | 'bankAccount';
   status: boolean;

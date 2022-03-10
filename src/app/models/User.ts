@@ -17,7 +17,9 @@ import {
   UserExperience,
   Lessee,
   UserSaves,
-  BoatRents
+  BoatRents,
+  ChatMessage,
+  Chat,
 } from './index';
 
 @Entity({ name: 'Users' })
@@ -152,10 +154,20 @@ export class User {
   })
   userSaves?: UserSaves[];
 
-  @OneToMany(() => BoatRents, (boarRent) => boarRent.user, {
+  @OneToMany(() => BoatRents, (boatRent) => boatRent.user, {
     onDelete: 'CASCADE',
   })
   boatRents?: BoatRents[];
+
+  @OneToMany(() => ChatMessage, (chatMessage) => chatMessage.fromUser, {
+    onDelete: 'CASCADE',
+  })
+  chatMessages?: ChatMessage[];
+
+  @OneToMany(() => Chat, (chat) => chat.user, {
+    onDelete: 'CASCADE',
+  })
+  chats?: Chat[];
 
   @CreateDateColumn({
     name: 'created_at',

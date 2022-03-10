@@ -13,3 +13,5 @@ export * from './UserPaymentMethod';
 export * from './Coupon';
 export * from './BoatRents';
 export * from './LesseeReceivingData';
+export * from './Chat';
+export * from './ChatMessage';

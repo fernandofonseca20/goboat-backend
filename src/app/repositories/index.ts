@@ -11,6 +11,7 @@ import UserPaymentMethodRepository from './UserPaymentMethodRepository';
 import BoatRentRepository from './BoatRentRepository';
 import CouponRepository from './CouponRepository';
 import LesseeReceivingDataRepository from './LesseeReceivingDataRepository';
+import ChatRepository from './ChatRepository';
 
 export {
   UserRepository,
@@ -26,4 +27,5 @@ export {
   BoatRentRepository,
   CouponRepository,
   LesseeReceivingDataRepository,
+  ChatRepository,
 };

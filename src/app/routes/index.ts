@@ -6,6 +6,7 @@ import HomeRoutes from './HomeRoutes';
 import BoatRoutes from './BoatRoutes';
 import BoatRentRoutes from './BoatRentRoutes';
 import LesseeRoutes from './LesseeRoutes';
+import ChatRoutes from './ChatRoutes';
 
 const API = '/api';
 
@@ -17,6 +18,7 @@ class Routes {
     app.use(API, BoatCategoryRoutes.getRoutes());
     app.use(API, BoatRentRoutes.getRoutes());
     app.use(API, LesseeRoutes.getRoutes());
+    app.use(API, ChatRoutes.getRoutes());
   }
 }
 

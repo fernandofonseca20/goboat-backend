@@ -13,7 +13,8 @@ import {
 import {
   User,
   Boat,
-  LesseeReceivingData
+  LesseeReceivingData,
+  Chat,
 } from './index';
 
 @Entity({ name: 'Lessee' })
@@ -36,6 +37,11 @@ export class Lessee {
     onDelete: 'CASCADE',
   })
   receivingDatas: LesseeReceivingData[];
+  
+  @OneToMany(() => Chat, (chat) => chat.user, {
+    onDelete: 'CASCADE',
+  })
+  chats?: Chat[];
 
   @CreateDateColumn({
     name: 'created_at',
