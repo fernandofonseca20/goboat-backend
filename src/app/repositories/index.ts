@@ -10,6 +10,7 @@ import UserSavesRepository from './UserSavesRepository';
 import UserPaymentMethodRepository from './UserPaymentMethodRepository';
 import BoatRentRepository from './BoatRentRepository';
 import CouponRepository from './CouponRepository';
+import LesseeReceivingDataRepository from './LesseeReceivingDataRepository';
 
 export {
   UserRepository,
@@ -24,4 +25,5 @@ export {
   UserPaymentMethodRepository,
   BoatRentRepository,
   CouponRepository,
+  LesseeReceivingDataRepository,
 };

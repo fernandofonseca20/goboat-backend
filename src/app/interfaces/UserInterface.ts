@@ -47,3 +47,14 @@ export interface ILessee {
   id?: number;
   user: number;
 }
+export interface ILesseeReceivingData {
+  type: string | 'pix' | 'bankAccount';
+  status: boolean;
+  pixType?: string | 'cpf' | 'phone' | 'email' | 'random';
+  pixKey?: string;
+  bankHolderName?: string;
+  bankAgency?: string;
+  bank?: string;
+  bankHolderDocument?: string;
+  bankAccount?: string;
+}

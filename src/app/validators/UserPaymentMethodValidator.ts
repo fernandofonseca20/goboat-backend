@@ -1,11 +1,6 @@
 import * as Yup from 'yup';
 import { IPaymentMethod } from '@interfaces';
 
-import moment from 'moment';
-
-const isSameOrBefore = (startTime, endTime) => {
-  return moment(startTime, 'HH:mm').isSameOrBefore(moment(endTime, 'HH:mm'));
-}
 class UserPaymentMethodValidator {
   async store(obj: object): Promise<IPaymentMethod> {
     const schema = Yup.object().shape({

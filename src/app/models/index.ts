@@ -12,3 +12,4 @@ export * from './UserSaves';
 export * from './UserPaymentMethod';
 export * from './Coupon';
 export * from './BoatRents';
+export * from './LesseeReceivingData';

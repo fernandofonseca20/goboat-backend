@@ -46,7 +46,7 @@ class BoatRentRepository {
         order: {
           createdAt: 'DESC',
         },
-        relations: ['boat', 'boat.lessee']
+        relations: ['boat', 'boat.lessee', 'user']
       });
 
     await queryRunner.release();

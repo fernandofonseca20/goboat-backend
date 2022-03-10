@@ -78,11 +78,6 @@ class UserRoutes {
       .route('/users/rents')
       .get(AuthMiddleware.user, UserController.listBoatRents);
 
-    this.router
-      .route('/lessees/rents')
-      .get(AuthMiddleware.lessee, UserController.lesseeListBoatRents);
-    // .delete(AuthMiddleware.user, UserController.destroy);
-
     return this.router;
   }
 }

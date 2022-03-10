@@ -5,6 +5,8 @@ import HomeController from './HomeController';
 import BoatController from './BoatController';
 import UserPaymentMethodController from './UserPaymentMethodController';
 import BoatRentController from './BoatRentController';
+import LesseeController from './LesseeController';
+import LesseeReceivingDataController from './LesseeReceivingDataController';
 
 export {
   UserController,
@@ -12,5 +14,7 @@ export {
   HomeController,
   BoatController,
   UserPaymentMethodController,
-  BoatRentController
+  BoatRentController,
+  LesseeController,
+  LesseeReceivingDataController,
 };
