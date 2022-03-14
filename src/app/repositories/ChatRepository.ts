@@ -26,7 +26,7 @@ class ChatRepository {
       rows.map(async (chat): Promise<IListItemChat> => {
 
         const lastMessage = await queryRunner.manager.findOne(ChatMessage, {
-          where:{
+          where: {
             chat: chat.id
           },
           relations: ['fromUser']
@@ -42,6 +42,25 @@ class ChatRepository {
 
     await queryRunner.release();
     return rowsResult;
+  }
+  async listMessageByChatId(chatId: number): Promise<{
+    messages: ChatMessage[], total: number
+  }> {
+    const connection: Connection = getConnection();
+    const queryRunner: QueryRunner = connection.createQueryRunner();
+
+    await queryRunner.connect();
+
+
+    const [messages, total]: [ChatMessage[], number] = await queryRunner.manager.findAndCount(ChatMessage, {
+      where: {
+        chat: chatId
+      },
+      relations: ['fromUser']
+    });
+
+    await queryRunner.release();
+    return { messages, total };
   }
 }
 
