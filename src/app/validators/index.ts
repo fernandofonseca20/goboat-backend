@@ -4,6 +4,7 @@ import BoatValidator from './BoatValidator';
 import UserPaymentMethodValidator from './UserPaymentMethodValidator';
 import BoatRentValidator from './BoatRentValidator';
 import LesseeReceivingDataValidator from './LesseeReceivingDataValidator';
+import ChatValidator from './ChatValidator';
 
 export {
   UserValidator,
@@ -11,4 +12,5 @@ export {
   UserPaymentMethodValidator,
   BoatRentValidator,
   LesseeReceivingDataValidator,
+  ChatValidator,
 };

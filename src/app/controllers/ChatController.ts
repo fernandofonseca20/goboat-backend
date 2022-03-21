@@ -4,7 +4,7 @@ import path from 'path';
 import * as Yup from 'yup';
 import { User } from '@models';
 import { Mailer, Sms, Storage, Token } from '@utils';
-import { UserValidator } from '@validators';
+import { ChatValidator } from '@validators';
 import { Socket } from 'socket.io';
 
 import {
@@ -24,9 +24,9 @@ class BoatCategoryController {
       return res.status(500).json({ message: error.message, error });
     }
   }
-  
+
   async listMessages(socket: Socket, data, next) {
-    try {  
+    try {
       const { chatId } = data;
 
       const messages = await ChatRepository.listMessageByChatId(chatId);
@@ -35,19 +35,20 @@ class BoatCategoryController {
 
       socket.emit('messages', messages);
 
-      
-     } catch (error) {
+
+    } catch (error) {
       console.log('VillageController list Message error', error);
 
       return next(new Error(error.message));
     }
   }
-  
-  async sendMessage(socket: Socket, data, next) {
+
+  // async sendMessage(socket: Socket, data, next) {
+  async sendMessage(req: Request, res: Response) {
     try {
 
-      const { user, chatId, text } = data;
-      let { image } = data;
+      const { user, chatId, text } = req.body;
+      let { image } = req.body;
 
       let type = 'text';
 
@@ -56,30 +57,52 @@ class BoatCategoryController {
         type = 'image';
       }
 
-      // const village = await ChatRepository.getById(+chatId);
+      let newArr = text.trim().split(" ");
+      // return newArr;
 
-      // const messageCreated = await VillageMessageRepository.store(user, { villageId, text, image, type })
+      let message = '';
+
+     await Promise.all(await newArr.map(async word => {
+        let text = word.replace(/([0-9]{2})/, '*');
+        text = text.replace(/([0-9]{3})/, '*');
+        text = text.replace(/([0-9]{3})/, '*');
+        text = text.replace(/([0-9]{3})/, '*');
+        text = text.replace(/([0-9]{3})/, '*');
+        const isEmail = await ChatValidator.isEmail({ email: word });
+        if (isEmail) {
+          text = '*****@****';
+        }
+        message += `${text} `;
+      }));
+
+
+      const chat = await ChatRepository.getChatById(+chatId);
+
+      if(!chat) {
+        return res.status(404).json({message: 'Chat not fount'})
+      }
+
+      const chatMessage = await ChatRepository.storeMessage({
+        typeMessage: 'text',
+        message: message,
+        fromUser: user.id
+      });
+
+      return res.status(201).json(chatMessage);
 
       // socket.emit('message', messageCreated);
       // socket.to(`village:${villageId}`).emit('message', messageCreated);
-
-
-      // await NotificationRepository.store(user.id, {
-      //   type: 'request-village',
-      //   message: `Foram enviadas novas mensagens na vila ${village.name}`,
-      //   village: villageId,
-      // });
-
 
       // return next();
 
     } catch (error) {
       console.log('VillageController list Message error', error);
 
-      return next(new Error(error.message));
+      // return next(new Error(error.message));
     }
   }
- 
+
+
 
 }
 

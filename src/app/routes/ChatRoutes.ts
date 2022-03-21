@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { ChatController } from '@controllers';
+import {AuthMiddleware} from '@middlewares'
 import multer, { Multer } from 'multer';
 
 class ChatRoutes {
@@ -16,6 +17,9 @@ class ChatRoutes {
     this.router
       .route('/chats')
       .get(ChatController.listChats);
+    this.router
+      .route('/chats/sendMessage')
+      .post(AuthMiddleware.user, ChatController.sendMessage);
 
     return this.router;
   }
