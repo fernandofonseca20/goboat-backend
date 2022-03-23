@@ -22,6 +22,12 @@ class BoatRentRoutes {
     this.router
       .route('/rents/:boatRentId')
       .get(AuthMiddleware.user, BoatRentController.getById);
+    this.router
+      .route('/rents/:boatRentId/accept' )
+      .get(AuthMiddleware.lessee, BoatRentController.lesseeAcceptRent);
+    this.router
+      .route('/rents/:boatRentId/reject' )
+      .post(AuthMiddleware.lessee, BoatRentController.lesseeRejectRent);
 
     return this.router;
   }

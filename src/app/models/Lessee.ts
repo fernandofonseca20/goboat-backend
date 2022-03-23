@@ -27,6 +27,12 @@ export class Lessee {
   @JoinColumn()
   user: User | number;
 
+
+  @Column('varchar', {
+    name: 'stripeAccount',
+    nullable: true
+  })
+  stripeAccount: string;
   
   @OneToMany(() => Boat, (boat) => boat.lessee, {
     onDelete: 'CASCADE',

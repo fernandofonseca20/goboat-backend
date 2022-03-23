@@ -17,54 +17,60 @@ import {
 
 @Entity({ name: 'LesseeReceivingData' })
 export class LesseeReceivingData {
-  
+
   @PrimaryGeneratedColumn('increment')
   id: number;
 
   @ManyToOne(() => Lessee, (lessee) => lessee.receivingDatas, { onDelete: 'CASCADE' })
   lessee: Lessee | number;
-  
+
   @Column('boolean', {
     name: 'status',
     default: true
   })
   status: boolean;
-  
+
   @Column('boolean', {
     name: 'principal',
     default: false,
   })
   principal: boolean;
-  
+
+  @Column('varchar', {
+    name: 'stripeExternalAccount',
+    nullable: true
+  })
+  stripeExternalAccount: string;
+
   @Column('varchar', {
     name: 'type',
   })
   type: string | 'pix' | 'bankAccount';
-  
+
   @Column('varchar', {
     name: 'pixType',
     nullable: true
   })
   pixType: string | 'cpf' | 'phone' | 'email' | 'random';
-  
+
   @Column('varchar', {
     name: 'pixKey',
     nullable: true
   })
   pixKey: string;
-  
+
   @Column('varchar', {
     name: 'bankHolderName',
     nullable: true
   })
   bankHolderName: string;
-  
+
   @Column('varchar', {
     name: 'bankAgency',
     nullable: true
   })
   bankAgency: string;
-  
+
   @Column('varchar', {
     name: 'bank',
     nullable: true

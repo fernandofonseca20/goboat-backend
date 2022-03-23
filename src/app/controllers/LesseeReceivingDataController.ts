@@ -7,6 +7,8 @@ import { ILesseeReceivingData } from '@interfaces';
 import { Mailer, Sms, Storage, Token } from '@utils';
 import { LesseeReceivingDataValidator } from '@validators';
 
+import Stripe from 'stripe';
+
 import {
   LesseeReceivingDataRepository
 
@@ -26,7 +28,37 @@ class LesseeReceivingDataController {
         body = await LesseeReceivingDataValidator.storeBank(reqBody);
       }
 
-      const ReceivingData = await LesseeReceivingDataRepository.store(body, userAuth.lessee.id);
+      let ReceivingData = await LesseeReceivingDataRepository.store(body, userAuth.lessee.id);
+
+      if (reqBody.type === 'bankAccount') {
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+          apiVersion: "2020-08-27"
+        });
+        const stripeExternalAccount = await stripe.accounts.createExternalAccount(userAuth.lessee.stripeAccount, {
+          // @ts-ignore
+          external_account: {
+            object: 'bank_account',
+            account_holder_name: body.bankHolderName,
+            account_holder_type: "individual",
+            account_number: process.env.NODE_ENV !== 'dev' ? body.bankAccount : "0001234",
+            country: "BR",
+            currency: "brl",
+            metadata: {
+              lessee_id: userAuth.lessee.id
+            },
+            routing_number: `${body.bank}-${body.bankAgency}`, // bank number - agency"260-0001"
+          },
+          default_for_currency: true,
+          expand: ['currency'],
+          metadata: {
+            lessee_id: userAuth.lessee.id,
+          }
+        });
+        ReceivingData = await LesseeReceivingDataRepository.update(ReceivingData?.id, {
+          stripeExternalAccount: stripeExternalAccount.id
+        }, userAuth.lessee.id);
+      }
+
 
       return res.status(201).json(ReceivingData);
 
@@ -50,6 +82,29 @@ class LesseeReceivingDataController {
       } else {
         body = await LesseeReceivingDataValidator.storeBank(reqBody);
       }
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+        apiVersion: "2020-08-27"
+      });
+
+      const account = await LesseeReceivingDataRepository.getById(+id, userAuth.lessee.id);
+      if (account.type === 'bankAccount') {
+        await stripe.accounts.updateExternalAccount(userAuth.lessee.stripeAccount, account.stripeExternalAccount, {
+          // @ts-ignore
+          external_account: {
+            object: 'bank_account',
+            account_holder_name: body.bankHolderName,
+            account_holder_type: "individual",
+            account_number: process.env.NODE_ENV !== 'dev' ? body.bankAccount : "0001234",
+            country: "BR",
+            currency: "brl",
+            metadata: {
+              lessee_id: userAuth.lessee.id
+            },
+            routing_number: `${body.bank}-${body.bankAgency}`, // bank number - agency"260-0001"
+          },
+          default_for_currency: true,
+        });
+      }
 
       const ReceivingData = await LesseeReceivingDataRepository.update(+id, body, userAuth.lessee.id);
 
@@ -69,7 +124,27 @@ class LesseeReceivingDataController {
       const principal = await LesseeReceivingDataRepository.getPrincipal(userAuth.lessee.id);
       const ReceivingDatas = await LesseeReceivingDataRepository.list(userAuth.lessee.id);
 
-      return res.json({principal: principal || false, rows: ReceivingDatas});
+      return res.json({ principal: principal || false, rows: ReceivingDatas });
+
+    } catch (error) {
+      console.log('LesseeReceivingDataController  error', error);
+
+      return res.status(500).json({ message: error.message, error });
+    }
+  }
+
+  async listExternalBankAccounts(req: Request, res: Response) {
+    try {
+      const { id } = req.params
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+        apiVersion: "2020-08-27"
+      });
+      const accountBankAccounts = await stripe.accounts.listExternalAccounts(
+        id,
+        { object: 'bank_account', limit: 3 }
+      );
+
+      return res.json(accountBankAccounts);
 
     } catch (error) {
       console.log('LesseeReceivingDataController  error', error);

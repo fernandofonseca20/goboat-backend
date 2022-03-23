@@ -1,10 +1,10 @@
 import { getConnection, Connection, QueryRunner, In } from 'typeorm';
-import { Lessee, User, LesseeReceivingData } from '@models';
-import { ILesseeReceivingData } from '@interfaces';
+import { Lessee, User, LesseeReceivingData, } from '@models';
+import { ILesseeReceivingData, ILesseeReceivingDataUpdate } from '@interfaces';
 import { StringFormatter } from '@utils';
 
 class LesseeReceivingDataRepository {
-  async store(body: ILesseeReceivingData, lesseeId: number): Promise<LesseeReceivingData | string> {
+  async store(body: ILesseeReceivingData, lesseeId: number): Promise<LesseeReceivingData> {
     const connection: Connection = getConnection();
     const queryRunner: QueryRunner = connection.createQueryRunner();
 
@@ -129,7 +129,7 @@ class LesseeReceivingDataRepository {
     }
   }
 
-  async update(id, body: ILesseeReceivingData, lesseeId: number): Promise<LesseeReceivingData> {
+  async update(id: number, body: ILesseeReceivingDataUpdate, lesseeId: number): Promise<LesseeReceivingData> {
     const connection: Connection = getConnection();
     const queryRunner: QueryRunner = connection.createQueryRunner();
 

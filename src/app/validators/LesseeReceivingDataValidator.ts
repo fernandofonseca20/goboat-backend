@@ -35,13 +35,14 @@ class LesseeReceivingDataValidator {
   }
   async storeBank(obj: object): Promise<ILesseeReceivingData> {
     const schema = Yup.object().shape({
-      type: Yup.string().test(value => value === 'pix').required(),
+      type: Yup.string().test(value => value === 'bankAccount').required(),
       status: Yup.boolean().required(),
       bankHolderName: Yup.string().required(),
       bankAgency: Yup.string().required(),
       bank: Yup.string().required(),
       bankHolderDocument: Yup.string().required(),
       bankAccount: Yup.string().required(),
+      bankIdStripe: Yup.string().required(),
     }
     );
 

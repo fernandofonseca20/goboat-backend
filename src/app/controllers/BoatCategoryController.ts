@@ -19,7 +19,7 @@ class BoatCategoryController {
 
       return res.status(200).json(data);
     } catch (error) {
-      console.log('UserController listJoinTypes error', error);
+      console.log('BoatCategoryController listActives error', error);
       return res.status(500).json({ error });
     }
   }

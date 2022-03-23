@@ -129,6 +129,45 @@ class BoatRentController {
       return res.status(500).json({ message: error.message, error });
     }
   }
+
+  async lesseeAcceptRent(req: Request, res: Response) {
+    try {
+      const { boatRentId } = req.params;
+      const { user } = req.body;
+
+      const boat = await BoatRentRepository.getById(+boatRentId);
+      
+      if (!boat) {
+        return res.status(404).json({ message: 'Boat rent nor found' })
+      }
+
+      
+
+    } catch (error) {
+      console.log('BoatRentController getById error', error);
+
+      return res.status(500).json({ message: error.message, error });
+    }
+  }
+
+  async lesseeRejectRent(req: Request, res: Response) {
+    try {
+      const { couponCode } = req.params;
+      const { user } = req.body;
+
+      const couponUsed = await CouponRepository.getUsed(couponCode, user.id);
+      if (typeof couponUsed === 'string') {
+        return res.status(401).json({ message: couponUsed })
+      }
+
+      return res.json({ message: 'Coupon is Valid' })
+
+    } catch (error) {
+      console.log('BoatRentController getById error', error);
+
+      return res.status(500).json({ message: error.message, error });
+    }
+  }
 }
 
 export default new BoatRentController();

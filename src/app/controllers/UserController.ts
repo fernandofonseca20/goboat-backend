@@ -17,6 +17,8 @@ import {
   BoatRentRepository,
 } from '@repositories';
 
+import Stripe from 'stripe';
+
 class UserController {
   async store(req: Request, res: Response): Promise<Response> {
     try {
@@ -88,43 +90,21 @@ class UserController {
     }
   }
 
-  async updateToLessee(req: Request, res: Response): Promise<Response> {
-    try {
-      const authUser = req.body.user;
-
-      const user: User = await UserRepository.getById(+authUser.id);
-      const lesseExist: Lessee = await LesseeRepository.getById(+user.id);
-
-      if (lesseExist) {
-        return res.status(401).json({ message: 'lessee already exists' })
-      }
-
-      const lessee = await LesseeRepository.store({ user: user.id });
-
-      return res.status(200).json({
-        user: {
-          typeUser: 'lessee',
-          user,
-          lessee
-        }
-      });
-    } catch (error) {
-      console.log('UserController getById error', error);
-
-      if (error instanceof EntityNotFoundError)
-        return res.status(404).json({ message: 'User not found', error });
-
-      return res.status(500).json({ message: error.message, error });
-    }
-  }
 
   async getById(req: Request, res: Response): Promise<Response> {
     try {
       const { user: userAuth } = req.body;
 
       const user: User = await UserRepository.getById(+userAuth.id);
+      
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+        apiVersion: "2020-08-27"
+      });
+
+      const stripeAccount = await stripe.accounts.list();
 
       return res.status(200).json({
+        stripeAccount,
         user: {
           ...user,
         }

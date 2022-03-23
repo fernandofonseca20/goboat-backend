@@ -62,3 +62,15 @@ export interface ILesseeReceivingData {
   bankHolderDocument?: string;
   bankAccount?: string;
 }
+export interface ILesseeReceivingDataUpdate {
+  type?: string | 'pix' | 'bankAccount';
+  status?: boolean;
+  pixType?: string | 'cpf' | 'phone' | 'email' | 'random';
+  pixKey?: string;
+  bankHolderName?: string;
+  bankAgency?: string;
+  bank?: string;
+  bankHolderDocument?: string;
+  bankAccount?: string;
+  stripeExternalAccount?: string;
+}

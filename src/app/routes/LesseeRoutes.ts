@@ -18,18 +18,25 @@ class LesseeRoutes {
     this.router
       .route('/lessees/rents')
       .get(AuthMiddleware.lessee, LesseeController.lesseeListBoatRents);
+
+    this.router
+      .route('/lessees/receivingDatas/listBanks/:id')
+      .get(AuthMiddleware.lessee, LesseeReceivingDataController.listExternalBankAccounts);
+
     this.router
       .route('/lessees/receivingDatas')
       .post(AuthMiddleware.lessee, LesseeReceivingDataController.store)
-      .get(AuthMiddleware.lessee, LesseeReceivingDataController.list)
+      .get(AuthMiddleware.lessee, LesseeReceivingDataController.list);
+
     this.router
       .route('/lessees/receivingDatas/principal/:id')
-      .patch(AuthMiddleware.lessee, LesseeReceivingDataController.setPrincipal)
+      .patch(AuthMiddleware.lessee, LesseeReceivingDataController.setPrincipal);
+
     this.router
       .route('/lessees/receivingDatas/:id')
       .get(AuthMiddleware.lessee, LesseeReceivingDataController.getById)
       .patch(AuthMiddleware.lessee, LesseeReceivingDataController.update)
-      .delete(AuthMiddleware.lessee, LesseeReceivingDataController.destroy)
+      .delete(AuthMiddleware.lessee, LesseeReceivingDataController.destroy);
     // .delete(AuthMiddleware.user, UserController.destroy);
 
     return this.router;

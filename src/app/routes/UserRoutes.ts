@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { UserController, UserPaymentMethodController } from '@controllers';
+import { UserController, LesseeController, UserPaymentMethodController } from '@controllers';
 import { AuthMiddleware } from '@middlewares';
 import multer, { Multer } from 'multer';
 
@@ -41,7 +41,7 @@ class UserRoutes {
 
     this.router
       .route('/users/updateToLessee')
-      .post(AuthMiddleware.user, UserController.updateToLessee);
+      .post(AuthMiddleware.user, LesseeController.updateToLessee);
 
     this.router
       .route('/users/cards')

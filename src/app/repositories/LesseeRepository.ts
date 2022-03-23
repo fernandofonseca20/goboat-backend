@@ -94,6 +94,30 @@ class LesseeRepository {
       await queryRunner.release();
     }
   }
+  
+  async update(id: number, body: any): Promise<Lessee> {
+    const connection: Connection = getConnection();
+    const queryRunner: QueryRunner = connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      await queryRunner.manager.update(Lessee, id, {
+        ...body,
+      });
+
+      await queryRunner.commitTransaction();
+      const lessee: Lessee = await this.getById(id);
+
+      return lessee;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
   async getByUserId(id: number): Promise<Lessee> {
     const connection: Connection = getConnection();
     const queryRunner: QueryRunner = connection.createQueryRunner();
