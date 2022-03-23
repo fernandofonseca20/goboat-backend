@@ -19,9 +19,9 @@ class LesseeRoutes {
       .route('/lessees/rents')
       .get(AuthMiddleware.lessee, LesseeController.lesseeListBoatRents);
 
-    this.router
-      .route('/lessees/receivingDatas/listBanks/:id')
-      .get(AuthMiddleware.lessee, LesseeReceivingDataController.listExternalBankAccounts);
+    // this.router
+    //   .route('/lessees/receivingDatas/listBanks/:id')
+    //   .get(AuthMiddleware.lessee, LesseeReceivingDataController.listExternalBankAccounts);
 
     this.router
       .route('/lessees/receivingDatas')

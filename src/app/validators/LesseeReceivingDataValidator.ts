@@ -42,7 +42,6 @@ class LesseeReceivingDataValidator {
       bank: Yup.string().required(),
       bankHolderDocument: Yup.string().required(),
       bankAccount: Yup.string().required(),
-      bankIdStripe: Yup.string().required(),
     }
     );
 

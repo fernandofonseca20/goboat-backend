@@ -50,9 +50,7 @@ class LesseeReceivingDataController {
           },
           default_for_currency: true,
           expand: ['currency'],
-          metadata: {
-            lessee_id: userAuth.lessee.id,
-          }
+          metadata: {}
         });
         ReceivingData = await LesseeReceivingDataRepository.update(ReceivingData?.id, {
           stripeExternalAccount: stripeExternalAccount.id
@@ -180,13 +178,26 @@ class LesseeReceivingDataController {
 
       const { id } = req.params;
 
-      const ReceivingDatas = await LesseeReceivingDataRepository.getById(+id, userAuth.lessee.id);
+      let ReceivingDatas = await LesseeReceivingDataRepository.getById(+id, userAuth.lessee.id);
 
       if (!ReceivingDatas) {
         return res.status(404).json({ message: 'ReceivingDatas not found' });
       }
 
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+        apiVersion: "2020-08-27"
+      });
+
+      const account = await LesseeReceivingDataRepository.getById(+id, userAuth.lessee.id);
+      if (account.type === 'bankAccount' && account.stripeExternalAccount) {
+        await stripe.accounts.updateExternalAccount(userAuth.lessee.stripeAccount, account.stripeExternalAccount, {
+          default_for_currency: true,
+        });
+      }
+
       await LesseeReceivingDataRepository.setPrincipal(+id, userAuth.lessee.id);
+
+      ReceivingDatas = await LesseeReceivingDataRepository.getById(+id, userAuth.lessee.id);
 
       return res.json(ReceivingDatas);
 
@@ -210,7 +221,16 @@ class LesseeReceivingDataController {
       }
 
       if (ReceivingDatas.principal) {
-        return res.status(401).json({ message: 'Deleting this pix key is necessary that add a new one as the main key' });
+        return res.status(401).json({ message: 'Deleting this account is necessary that add a new one as the principal' });
+      }
+
+      if (ReceivingDatas.type === 'bankAccount' && ReceivingDatas.stripeExternalAccount) {
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+          apiVersion: "2020-08-27"
+        });
+         await stripe.accounts.deleteExternalAccount(
+          userAuth.lessee.stripeAccount, ReceivingDatas.stripeExternalAccount
+        );
       }
 
       const result = await LesseeReceivingDataRepository.destroy(+id, userAuth.lessee.id);
