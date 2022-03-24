@@ -15,7 +15,9 @@ import {
 import { IBoatRent } from '@interfaces';
 import { User } from '@models';
 
-import { Code } from '@utils'
+import { Code } from '@utils';
+
+import { Stripe } from 'stripe';
 
 class BoatRentController {
 
@@ -23,7 +25,7 @@ class BoatRentController {
     try {
       const { user, ...reqBody } = req.body;
       const { boatId } = req.params;
-      const { typePayment, card, coupon, ...boatBody } = await BoatRentValidator.store(reqBody);
+      const { typePayment, paymentMethod, coupon, ...boatBody } = await BoatRentValidator.store(reqBody);
 
       const boat = await BoatRepository.getById(+boatId);
       if (!boat) {
@@ -36,10 +38,10 @@ class BoatRentController {
       }
 
       if (typePayment !== 'pix') {
-        const cardExist = await UserPaymentMethodRepository.getById(card, user.id);
+        const paymentMethodExist = await UserPaymentMethodRepository.getById(paymentMethod, user.id);
 
-        if (!cardExist) {
-          return res.status(401).json({ message: 'Card not exist' });
+        if (!paymentMethodExist) {
+          return res.status(401).json({ message: 'paymentMethod not exist' });
         }
       }
 
@@ -65,7 +67,7 @@ class BoatRentController {
         peoples: boatBody.peoples,
         coupon: null,
         typePayment: typePayment,
-        card: typePayment === 'pix' ? null : card,
+        paymentMethod: typePayment === 'pix' ? null : paymentMethod,
         paymentStatus: null,
         code: Code.generate().toString(),
         amount,
@@ -133,15 +135,57 @@ class BoatRentController {
   async lesseeAcceptRent(req: Request, res: Response) {
     try {
       const { boatRentId } = req.params;
-      const { user } = req.body;
+      const { user: userAuth } = req.body;
 
-      const boat = await BoatRentRepository.getById(+boatRentId);
-      
-      if (!boat) {
+      let { paymentMethod, ...boatRent } = await BoatRentRepository.getById(+boatRentId);
+
+      if (!boatRent) {
         return res.status(404).json({ message: 'Boat rent nor found' })
       }
 
-      
+      if (typeof paymentMethod === 'number') {
+        // @ts-ignore
+        paymentMethod = await UserPaymentMethodRepository.getById(paymentMethod, boatRent.user.id);
+      }
+
+      boatRent = await BoatRentRepository.accept(+boatRentId);
+
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+        apiVersion: "2020-08-27"
+      });
+
+      const customer = await stripe.customers.create(); // This example just creates a new Customer every time
+
+      const stripePaymentMethod = await stripe.paymentMethods.create({
+        type: 'card',
+        card: {
+          number: process.env.NODE_ENV !== 'dev' ? paymentMethod.number : '4242424242424242',
+          exp_month: process.env.NODE_ENV !== 'dev' ? +paymentMethod.expMonth : 3,
+          exp_year: process.env.NODE_ENV !== 'dev' ? +paymentMethod.expYear : 2023,
+          cvc: process.env.NODE_ENV !== 'dev' ? paymentMethod.cvv : '314',
+        },
+      });
+      await stripe.paymentMethods.attach(
+        stripePaymentMethod.id,
+        { customer: customer.id }
+      );
+
+      const intent = await stripe.paymentIntents.create({
+        payment_method: stripePaymentMethod.id,
+        customer: customer.id,
+        amount: 1099,
+        currency: 'usd',
+        confirmation_method: 'manual',
+        confirm: true
+      });
+
+      await BoatRentRepository.updatePayment(+boatRentId, {
+        stripePaymentIntent: intent.id,
+        paymentStatus: intent.status
+      });
+
+      return res.json(intent);
+
 
     } catch (error) {
       console.log('BoatRentController getById error', error);
@@ -159,7 +203,6 @@ class BoatRentController {
       if (typeof couponUsed === 'string') {
         return res.status(401).json({ message: couponUsed })
       }
-
       return res.json({ message: 'Coupon is Valid' })
 
     } catch (error) {
@@ -167,6 +210,71 @@ class BoatRentController {
 
       return res.status(500).json({ message: error.message, error });
     }
+  }
+
+  async stipeWebhook(req: Request, res: Response) {
+    const sig = req.headers['stripe-signature'];
+
+    let event;
+    const endpointSecret = "whsec_0867cb18c0aa9019570ac273964c46382b99a2822b9717b924481f0b10c68be0";
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2020-08-27"
+    });
+
+    try {
+      // event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+      // Handle the event
+      const event = req.body;
+      const paymentIntent = event.data.object;
+
+      const boatRent = await BoatRentRepository.getByPaymentIntent(paymentIntent.id);
+
+      if (!boatRent) {
+        return res.status(404).json({ message: 'Boat rent not found' })
+      }
+
+      switch (req.body.type) {
+        case 'payment_intent.succeeded':
+
+          await BoatRentRepository.updatePayment(+boatRent.id, {
+            paymentStatus: event.data.object.status,
+            status: 'confirmed'
+          });
+          console.log(event);
+          console.log(req.body)
+          console.log(paymentIntent)
+          return res.send();
+          break;
+        // ... handle other event types
+        case 'payment_intent.payment_failed':
+
+          await BoatRentRepository.updatePayment(+boatRent.id, {
+            paymentStatus: event.data.object.status,
+            status: 'canceled'
+          });
+          return res.send();
+
+        case 'payment_intent.canceled':
+
+          await BoatRentRepository.updatePayment(+boatRent.id, {
+            paymentStatus: event.data.object.status,
+            status: 'canceled'
+          });
+          console.log(event);
+          console.log(req.body)
+          console.log(paymentIntent)
+          return res.send();
+        default:
+          console.log(`Unhandled event type ${event.type}`);
+      }
+    } catch (err) {
+      res.status(400).send(`Webhook Error: ${err.message}`);
+      return;
+    }
+
+    // Return a 200 response to acknowledge receipt of the event
+    res.send();
   }
 }
 

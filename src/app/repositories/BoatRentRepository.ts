@@ -1,12 +1,12 @@
 import { getConnection, Connection, QueryRunner, In } from 'typeorm';
 import { BoatRents } from '@models';
-import { IBoatRent } from '@interfaces';
+import { IBoatRent, IBoatRentupdatePayment } from '@interfaces';
 import { StringFormatter } from '@utils';
 
 class BoatRentRepository {
 
 
-  private relations: string[] = ['user', 'boat','boat.lessee','boat.lessee.user', ];
+  private relations: string[] = ['user', 'boat', 'boat.lessee', 'boat.lessee.user', 'paymentMethod', 'coupon'];
 
   async store(body: IBoatRent): Promise<BoatRents | string> {
     const connection: Connection = getConnection();
@@ -38,9 +38,9 @@ class BoatRentRepository {
 
     await queryRunner.connect();
 
-    const rows: BoatRents[]=
+    const rows: BoatRents[] =
       await queryRunner.manager.find(BoatRents, {
-        where:{
+        where: {
           'boat.lessee': lesseeId
         },
         order: {
@@ -62,7 +62,7 @@ class BoatRentRepository {
 
     const rows: BoatRents[] =
       await queryRunner.manager.find(BoatRents, {
-        where:{
+        where: {
           user: userId,
         },
         order: {
@@ -83,6 +83,28 @@ class BoatRentRepository {
 
     try {
       const boatRent = await queryRunner.manager.findOne(BoatRents, id, {
+        relations: this.relations
+      });
+
+      return boatRent;
+    } catch (error) {
+      console.log('BoatRentRepository getById error', error);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async getByPaymentIntent(stripePaymentIntent: string): Promise<BoatRents> {
+    const connection: Connection = getConnection();
+    const queryRunner: QueryRunner = connection.createQueryRunner();
+
+    await queryRunner.connect();
+
+    try {
+      const boatRent = await queryRunner.manager.findOne(BoatRents, {
+        stripePaymentIntent: stripePaymentIntent
+      }, {
         relations: this.relations
       });
 
@@ -130,6 +152,55 @@ class BoatRentRepository {
 
 
       await queryRunner.manager.update(BoatRents, id, body);
+
+      await queryRunner.commitTransaction();
+
+      const boatRent = await queryRunner.manager.findOneOrFail(BoatRents, id);
+
+      return boatRent;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+  async updatePayment(id: number, body: IBoatRentupdatePayment): Promise<BoatRents | string> {
+    const connection: Connection = getConnection();
+    const queryRunner: QueryRunner = connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+
+
+      await queryRunner.manager.update(BoatRents, id, body);
+
+      await queryRunner.commitTransaction();
+
+      const boatRent = await queryRunner.manager.findOneOrFail(BoatRents, id);
+
+      return boatRent;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+  async accept(id: number): Promise<BoatRents> {
+    const connection: Connection = getConnection();
+    const queryRunner: QueryRunner = connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+
+      await queryRunner.manager.update(BoatRents, id, {
+        status: 'waintingPayment'
+      });
 
       await queryRunner.commitTransaction();
 

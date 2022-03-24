@@ -43,6 +43,7 @@ class UserPaymentMethodController {
       return res.status(500).json({ message: error.message, error });
     }
   }
+  
   async update(req: Request, res: Response) {
     try {
 

@@ -11,9 +11,9 @@ class BoatRentValidator {
       typePayment: Yup.string().test('typePayment',
         'set the payment type correctly',
         function (item) {
-          return ['cardCredit', 'cardDebit', 'pix'].includes(item);
+          return ['creditCard', 'debitCard', 'pix'].includes(item);
         }),
-      card: Yup.number().nullable(),
+      paymentMethod: Yup.number().nullable(),
     }
     );
 

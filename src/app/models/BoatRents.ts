@@ -27,6 +27,12 @@ export class BoatRents {
   paymentStatus: string;
 
   @Column('varchar', {
+    name: 'stripePaymentIntent',
+    nullable: true
+  })
+  stripePaymentIntent: string;
+
+  @Column('varchar', {
     name: 'code',
   })
   code: string;
@@ -81,10 +87,10 @@ export class BoatRents {
   })
   coupon?: Coupon | number;
 
-  @ManyToOne(() => UserPaymentMethod, (card) => card.boatRents, {
+  @ManyToOne(() => UserPaymentMethod, (paymentMethod) => paymentMethod.boatRents, {
     onDelete: 'CASCADE',
   })
-  card?: UserPaymentMethod | number;
+  paymentMethod?: UserPaymentMethod | number;
 
   @CreateDateColumn({
     name: 'created_at',

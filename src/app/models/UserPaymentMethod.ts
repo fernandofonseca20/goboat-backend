@@ -22,7 +22,7 @@ export class UserPaymentMethod {
   @ManyToOne(() => User, (user) => user.userSaves, { onDelete: 'CASCADE' })
   user: User | number;
 
-  @OneToMany(() => BoatRents, (boat) => boat.card, { onDelete: 'CASCADE' })
+  @OneToMany(() => BoatRents, (boat) => boat.paymentMethod, { onDelete: 'CASCADE' })
   boatRents: BoatRents[];
 
   @Column({
@@ -36,6 +36,20 @@ export class UserPaymentMethod {
     type: 'varchar',
   })
   expiryDate: string;
+
+  @Column({
+    name: 'expYear',
+    type: 'varchar',
+    default: '25'
+  })
+  expYear: string;
+
+  @Column({
+    name: 'expMonth',
+    type: 'varchar',
+    default: '11'
+  })
+  expMonth: string;
 
   @Column({
     name: 'cvv',

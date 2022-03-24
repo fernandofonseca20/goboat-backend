@@ -20,13 +20,16 @@ class BoatRentRoutes {
     //   .post(AuthMiddleware.lessee, BoatRentController.store);
 
     this.router
+      .route('/stripe_webhook')
+      .post(BoatRentController.stipeWebhook);
+    this.router
       .route('/rents/:boatRentId')
       .get(AuthMiddleware.user, BoatRentController.getById);
     this.router
-      .route('/rents/:boatRentId/accept' )
-      .get(AuthMiddleware.lessee, BoatRentController.lesseeAcceptRent);
+      .route('/rents/:boatRentId/accept')
+      .post(AuthMiddleware.lessee, BoatRentController.lesseeAcceptRent);
     this.router
-      .route('/rents/:boatRentId/reject' )
+      .route('/rents/:boatRentId/reject')
       .post(AuthMiddleware.lessee, BoatRentController.lesseeRejectRent);
 
     return this.router;

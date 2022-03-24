@@ -3,16 +3,21 @@ export interface IBoatRentStore   {
   checkout: Date,
   peoples: number,
   coupon: string,
-  typePayment: string | 'cardCredit' | 'cardDebit' | 'pix',
-  card: number
+  typePayment: string | 'creditCard' | 'debitCard' | 'pix',
+  paymentMethod: number
+}
+export interface IBoatRentupdatePayment   {
+  stripePaymentIntent?: string,
+  status?: string,
+  paymentStatus: string,
 }
 export interface IBoatRent   {
   checkin: Date,
   checkout: Date,
   peoples: number,
   coupon?: number,
-  typePayment: string | 'cardCredit' | 'cardDebit' | 'pix',
-  card?: number,
+  typePayment: string | 'creditCard' | 'debitCard' | 'pix',
+  paymentMethod?: number,
   paymentStatus: string,
   code: string,
   amount: number,
@@ -20,5 +25,6 @@ export interface IBoatRent   {
   amountRetention: number,
   user: number,
   boat: number,
+  stripePaymentIntent?: string,
   status: 'waitingApproval' | 'waintingPayment' | 'confirmed' | 'concluded'
 }
